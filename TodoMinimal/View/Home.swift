@@ -20,7 +20,7 @@ struct Home: View {
     //MARK: - ModelContext
     @Environment(\.modelContext) private var context
     
-    
+    @State private var showAll : Bool = false
 //MARK: - BODY
     var body: some View {
         List{
@@ -29,7 +29,7 @@ struct Home: View {
                TodoRowView(todo: $0)
                 }
             }
-            CompletedTodoList()
+            CompletedTodoList(showAll: $showAll)
         }
         .toolbar{
             ToolbarItem(placement: .bottomBar){

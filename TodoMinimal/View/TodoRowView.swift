@@ -14,11 +14,15 @@ struct TodoRowView: View {
     @FocusState private var isActive: Bool
     
     @Environment(\.modelContext) private var context
-    
+    @Environment(\.scenePhase) private var phase
     var body: some View {
         HStack(spacing: 8){
             if !isActive && !todo.task.isEmpty {
-                Button(action: {}, label: {
+                Button(action: {
+                    todo.isCompleted.toggle()
+                    todo.lastUpdated = .now
+                    
+                }, label: {
                     Image(systemName:  todo.isCompleted ? "checkmark.circle.fill": "circle")
                         .font(.title2)
                         .padding(3)
@@ -57,6 +61,7 @@ struct TodoRowView: View {
             }
         }
         .listRowInsets(.init(top: 10, leading: 10, bottom: 10, trailing: 10))
+        .animation(.snappy, value: isActive)
         .onAppear{
             isActive = todo.task.isEmpty
         }
@@ -72,6 +77,11 @@ struct TodoRowView: View {
                 /// deleting
                 context.delete(todo)
             
+            }
+        }
+        .onChange(of: phase){ oldValue, newValue in
+            if newValue != .active && todo.task.isEmpty {
+                context.delete(todo)
             }
         }
     }
